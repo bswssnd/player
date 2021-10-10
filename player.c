@@ -21,14 +21,14 @@ int player_stream(player_t* pl, const char* url) {
     if(ret < 0)
         return PLAYER_MEDIA_INVALID;
     
-    ret = av_find_best_stream(pl->demuxer, AVMEDIA_TYPE_AUDIO, -1, -1, &dec, 0);
+    ret = av_find_best_stream(pl->demuxer, AVMEDIA_TYPE_AUDIO, -1, -1, &audcodec, 0);
     if(ret == AVERROR_STREAM_NOT_FOUND)
         return PLAYER_MEDIA_INAUDIBLE;
     else
         return PLAYER_MEDIA_INVALID;
 
     audio = pl->demuxer->streams[ret];
-    audinfo = pl->audio->codecpar;
+    audinfo = audio->codecpar;
 
     pl->decoder = avcodec_alloc_context3(audcodec);
     
@@ -37,7 +37,7 @@ int player_stream(player_t* pl, const char* url) {
         AV_SAMPLE_FMT_S16,
         48000,
         audinfo->channel_layout,
-        audinfo->sample_fmt,
+        audinfo->format,
         audinfo->sample_rate,
         0, NULL);
     
@@ -46,7 +46,7 @@ int player_stream(player_t* pl, const char* url) {
     pl->frame = av_frame_alloc();
     
     // 48000 Hz, 16-bit (BE), Stereo, 20ms frame
-    pl->frame->linesize = PLAYER_AUDIO_BUFFER_MAX_SIZE;
+    pl->frame->linesize[0] = PLAYER_AUDIO_BUFFER_MAX_SIZE;
 
     // TODO: figure out if these are redundant or not
     pl->frame->channel_layout = AV_CH_LAYOUT_STEREO;
@@ -54,7 +54,7 @@ int player_stream(player_t* pl, const char* url) {
     pl->frame->nb_samples = 960;
     pl->frame->channels = 2;
 
-    pl->frame->data = av_malloc(pl->frame->linesize);
+    pl->frame->data[0] = av_malloc(pl->frame->linesize);
 }
 
 int player_get_20ms_audio(player_t* pl, uint8_t* out_data, size_t *out_size) {
