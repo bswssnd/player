@@ -1,28 +1,38 @@
 #include <string.h>
+#include <stdbool.h>
 
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
 #include <libswresample/swresample.h>
+#include <libavutil/opt.h>
 
 typedef struct {
     AVFormatContext* demuxer;
     AVCodecContext* decoder;
 
-    AVFrame *frame;
-    AVPacket* held_pkt;
+    AVFrame *out_frame, *in_frame;
+    AVPacket* pkt;
+    AVStream* stream;
+
+    bool pkt_held;
+    bool fmt_eof;
+    bool codec_eof;
 
     SwrContext* resampler;
 } player_t;
 
 typedef enum {
+    PLAYER_NO_ERROR,
     PLAYER_MEDIA_INAUDIBLE,
     PLAYER_MEDIA_INVALID,
+    PLAYER_MEDIA_DECODE_ERROR,
+    PLAYER_MEDIA_INTERNAL_ERROR,
     PLAYER_MEDIA_EOF
 } player_err_t;
 
-#define PLAYER_AUDIO_BUFFER_MAX_SIZE 3840
+#define PLAYER_AUDIO_BUFFER_MAX_SIZE 3840 // 960, stereo, 16-bit
 
-int player_init(player_t* pl);
+player_err_t player_init(player_t* pl);
 
 /**
  * \brief Queue a media file specified by a URL.
@@ -32,7 +42,7 @@ player_err_t player_stream(player_t* pl, const char* url);
 /**
  * \brief Retrieve a ≤20ms stereo audio slice resampled to 48000 Hz, s16be.
  * \param out_data a buffer with capacity PLAYER_AUDIO_BUFFER_MAX_SIZE
- * \param out_size usable portion size of the supplied buffer
+ * \param out_size usable portion size (in bytes) of the supplied buffer
  */
 player_err_t player_get_20ms_audio(player_t* pl, uint8_t* out_data, size_t *out_size);
 
