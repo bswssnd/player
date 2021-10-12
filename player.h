@@ -1,6 +1,10 @@
+#include <stddef.h>
+#include <stdint.h>
+
 #ifndef BITTU_PLAYER
 #define BITTU_PLAYER
-typedef struct player_t;
+typedef struct player player_t;
+
 typedef enum {
     PLAYER_NO_ERROR,
     PLAYER_MEDIA_INAUDIBLE,

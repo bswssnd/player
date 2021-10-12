@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 
 #include <libavformat/avformat.h>
@@ -8,7 +9,7 @@
 
 #include "player.h"
 
-typedef struct {
+typedef struct player {
     AVFormatContext* demuxer;
     AVCodecContext* decoder;
 
