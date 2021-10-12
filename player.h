@@ -1,26 +1,6 @@
-#include <string.h>
-#include <stdbool.h>
-
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
-#include <libswresample/swresample.h>
-#include <libavutil/opt.h>
-
-typedef struct {
-    AVFormatContext* demuxer;
-    AVCodecContext* decoder;
-
-    AVFrame *out_frame, *in_frame;
-    AVPacket* pkt;
-    AVStream* stream;
-
-    bool pkt_held;
-    bool fmt_eof;
-    bool codec_eof;
-
-    SwrContext* resampler;
-} player_t;
-
+#ifndef BITTU_PLAYER
+#define BITTU_PLAYER
+typedef struct player_t;
 typedef enum {
     PLAYER_NO_ERROR,
     PLAYER_MEDIA_INAUDIBLE,
@@ -31,6 +11,8 @@ typedef enum {
 } player_err_t;
 
 #define PLAYER_AUDIO_BUFFER_MAX_SIZE 3840 // 960, stereo, 16-bit
+
+player_t* player_alloc();
 
 player_err_t player_init(player_t* pl);
 
@@ -46,4 +28,5 @@ player_err_t player_stream(player_t* pl, const char* url);
  */
 player_err_t player_get_20ms_audio(player_t* pl, uint8_t* out_data, size_t *out_size);
 
-void player_free(player_t* pl);
+void player_uninit(player_t* pl);
+#endif

@@ -1,4 +1,31 @@
+#include <string.h>
+#include <stdbool.h>
+
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
+#include <libswresample/swresample.h>
+#include <libavutil/opt.h>
+
 #include "player.h"
+
+typedef struct {
+    AVFormatContext* demuxer;
+    AVCodecContext* decoder;
+
+    AVFrame *out_frame, *in_frame;
+    AVPacket* pkt;
+    AVStream* stream;
+
+    bool pkt_held;
+    bool fmt_eof;
+    bool codec_eof;
+
+    SwrContext* resampler;
+} player_t;
+
+player_t* player_alloc() {
+    return malloc(sizeof(player_t));
+}
 
 player_err_t player_init(player_t* pl) {
     pl->demuxer = NULL;
@@ -127,7 +154,7 @@ player_err_t player_get_20ms_audio(player_t* pl, uint8_t* out_data, size_t *out_
     return (*out_size == 0) ? PLAYER_MEDIA_EOF : PLAYER_NO_ERROR;
 }
 
-void player_free(player_t* pl) {
+void player_uninit(player_t* pl) {
     swr_free(&pl->resampler);
 
     av_frame_free(&pl->in_frame);
