@@ -69,9 +69,13 @@ player_err_t player_stream(player_t* pl, const char* url) {
         audinfo->format,
         audinfo->sample_rate,
         0, NULL);
-    
+
     if(pl->resampler == NULL)
         return PLAYER_MEDIA_INTERNAL_ERROR;
+    
+    // aggressive options for throughput over unnoticable quality decrease
+    av_opt_set_int(pl->resampler, "dither_method", SWR_DITHER_NONE, 0);
+    av_opt_set_int(pl->resampler, "exact_rational", 0, 0);
 
     return PLAYER_NO_ERROR && !swr_init(pl->resampler);
 }
@@ -109,20 +113,9 @@ player_err_t player_get_20ms_audio(player_t* pl, uint8_t* out_data, size_t *out_
                 return PLAYER_MEDIA_DECODE_ERROR;
         }
 
-    if(!pl->codec_eof) {
-        int ret;
-
-        if((ret = swr_convert_frame(pl->resampler, NULL, pl->in_frame)) == AVERROR_INPUT_CHANGED) {
-            av_opt_set_channel_layout(pl->resampler, "icl", pl->in_frame->channel_layout, 0);
-            av_opt_set_sample_fmt(pl->resampler, "isf", pl->in_frame->format, 0);
-            av_opt_set_int(pl->resampler, "isr", pl->in_frame->sample_rate, 0);
-
-            ret |= swr_convert_frame(pl->resampler, NULL, pl->in_frame);
-        }
-
-        if(ret != 0)
+    if(!pl->codec_eof)
+        if(swr_convert_frame(pl->resampler, NULL, pl->in_frame) != 0)
             return PLAYER_MEDIA_INTERNAL_ERROR;
-    }
     
     if(swr_convert_frame(pl->resampler, pl->out_frame, NULL) != 0)
         return PLAYER_MEDIA_INTERNAL_ERROR;
