@@ -16,9 +16,7 @@ typedef enum {
 
 #define PLAYER_AUDIO_BUFFER_MAX_SIZE 3840 // 960, stereo, 16-bit
 
-player_t* player_alloc();
-
-player_err_t player_init(player_t* pl);
+player_t* player_init();
 
 /**
  * \brief Queue a media file specified by a URL.

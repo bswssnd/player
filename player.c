@@ -24,11 +24,9 @@ typedef struct player {
     SwrContext* resampler;
 } player_t;
 
-player_t* player_alloc() {
-    return malloc(sizeof(player_t));
-}
+player_t* player_init() {
+    player_t* pl = malloc(sizeof(player_t));
 
-player_err_t player_init(player_t* pl) {
     pl->demuxer = NULL;
     pl->decoder = NULL;
     pl->out_frame = NULL;
@@ -42,7 +40,7 @@ player_err_t player_init(player_t* pl) {
     pl->out_frame = av_frame_alloc();
 
     if(!pl->in_frame || !pl->out_frame)
-        return PLAYER_MEDIA_INTERNAL_ERROR;
+        return NULL;
     
     // 48000 Hz, 16-bit (BE), Stereo, 20ms out_frame
     pl->out_frame->format = AV_SAMPLE_FMT_S16;
@@ -51,11 +49,11 @@ player_err_t player_init(player_t* pl) {
     pl->out_frame->nb_samples = 960;
 
     if(av_frame_get_buffer(pl->out_frame, 0))
-        return PLAYER_MEDIA_INTERNAL_ERROR;
+        return NULL;
 
     pl->pkt = av_packet_alloc();
     if(pl->pkt)
-        return PLAYER_MEDIA_INTERNAL_ERROR;
+        return NULL;
 }
 
 player_err_t player_stream(player_t* pl, const char* url) {
