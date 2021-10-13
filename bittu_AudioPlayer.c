@@ -1,4 +1,4 @@
-#include "jni_iface.h"
+#include "bittu_AudioPlayer.h"
 #include "player.h"
 
 JNIEXPORT void JNICALL Java_bittu_AudioPlayer_init

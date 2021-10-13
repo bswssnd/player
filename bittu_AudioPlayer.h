@@ -7,6 +7,20 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#undef bittu_AudioPlayer_PLAYER_AUDIO_BUFFER_MAX_SIZE
+#define bittu_AudioPlayer_PLAYER_AUDIO_BUFFER_MAX_SIZE 3840L
+#undef bittu_AudioPlayer_PLAYER_NO_ERROR
+#define bittu_AudioPlayer_PLAYER_NO_ERROR 0L
+#undef bittu_AudioPlayer_PLAYER_MEDIA_INAUDIBLE
+#define bittu_AudioPlayer_PLAYER_MEDIA_INAUDIBLE -1L
+#undef bittu_AudioPlayer_PLAYER_MEDIA_INVALID
+#define bittu_AudioPlayer_PLAYER_MEDIA_INVALID -2L
+#undef bittu_AudioPlayer_PLAYER_MEDIA_DECODE_ERROR
+#define bittu_AudioPlayer_PLAYER_MEDIA_DECODE_ERROR -3L
+#undef bittu_AudioPlayer_PLAYER_MEDIA_INTERNAL_ERROR
+#define bittu_AudioPlayer_PLAYER_MEDIA_INTERNAL_ERROR -4L
+#undef bittu_AudioPlayer_PLAYER_MEDIA_EOF
+#define bittu_AudioPlayer_PLAYER_MEDIA_EOF -5L
 /*
  * Class:     bittu_AudioPlayer
  * Method:    init
@@ -25,7 +39,7 @@ JNIEXPORT jint JNICALL Java_bittu_AudioPlayer_stream
 
 /*
  * Class:     bittu_AudioPlayer
- * Method:    get_20ms
+ * Method:    get20ms
  * Signature: ([B)I
  */
 JNIEXPORT jint JNICALL Java_bittu_AudioPlayer_get20ms
