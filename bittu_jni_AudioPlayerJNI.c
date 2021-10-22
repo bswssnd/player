@@ -1,7 +1,9 @@
-#include "bittu_AudioPlayer.h"
+#include <stdlib.h>
+
+#include "bittu_jni_AudioPlayerJNI.h"
 #include "player.h"
 
-JNIEXPORT void JNICALL Java_bittu_AudioPlayer_init
+JNIEXPORT void JNICALL Java_bittu_jni_AudioPlayerJNI_init
   (JNIEnv * env, jobject this)
 {
     jfieldID f_ptr = (*env)->GetFieldID(
@@ -11,7 +13,7 @@ JNIEXPORT void JNICALL Java_bittu_AudioPlayer_init
     (*env)->SetLongField(env, this, f_ptr, player_init());
 }
 
-JNIEXPORT jint JNICALL Java_bittu_AudioPlayer_stream
+JNIEXPORT jint JNICALL Java_bittu_jni_AudioPlayerJNI_stream
   (JNIEnv * env, jobject this, jstring url)
 {
     jfieldID f_ptr = (*env)->GetFieldID(
@@ -26,7 +28,7 @@ JNIEXPORT jint JNICALL Java_bittu_AudioPlayer_stream
     return -ret;
 }
 
-JNIEXPORT jint JNICALL Java_bittu_AudioPlayer_get20ms
+JNIEXPORT jint JNICALL Java_bittu_jni_AudioPlayerJNI_get20ms
   (JNIEnv * env, jobject this, jbyteArray buf)
 {
     jfieldID f_ptr = (*env)->GetFieldID(
@@ -42,11 +44,11 @@ JNIEXPORT jint JNICALL Java_bittu_AudioPlayer_get20ms
     return ret == PLAYER_NO_ERROR ? out_size : -ret;
 }
 
-JNIEXPORT void JNICALL Java_bittu_AudioPlayer_uninit
+JNIEXPORT void JNICALL Java_bittu_jni_AudioPlayerJNI_uninit
   (JNIEnv * env, jobject this)
 {
     jfieldID f_ptr = (*env)->GetFieldID(
         env, (*env)->GetObjectClass(env, this), "ptr", "J");
-    
+
     player_uninit((*env)->GetLongField(env, this, f_ptr));
 }
