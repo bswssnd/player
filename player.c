@@ -162,4 +162,6 @@ void player_uninit(player_t* pl) {
     
     avcodec_free_context(&pl->decoder);
     avformat_free_context(pl->demuxer);
+
+    free(pl);
 }
