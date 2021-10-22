@@ -27,33 +27,33 @@ typedef struct player {
 player_t* player_init() {
     player_t* pl = malloc(sizeof(player_t));
 
-    pl->demuxer = NULL;
-    pl->decoder = NULL;
+    pl->demuxer   = NULL;
+    pl->decoder   = NULL;
     pl->out_frame = NULL;
     pl->resampler = NULL;
-
-    pl->pkt_held = false;
-    pl->fmt_eof = false;
+    pl->pkt_held  = false;
+    pl->fmt_eof   = false;
     pl->codec_eof = false;
-
-    pl->in_frame = av_frame_alloc();
+    pl->in_frame  = av_frame_alloc();
     pl->out_frame = av_frame_alloc();
 
     if(!pl->in_frame || !pl->out_frame)
         return NULL;
     
     // 48000 Hz, 16-bit (BE), Stereo, 20ms out_frame
-    pl->out_frame->format = AV_SAMPLE_FMT_S16;
+    pl->out_frame->format         = AV_SAMPLE_FMT_S16;
     pl->out_frame->channel_layout = AV_CH_LAYOUT_STEREO;
-    pl->out_frame->sample_rate = 48000;
-    pl->out_frame->nb_samples = 960;
+    pl->out_frame->sample_rate    = 48000;
+    pl->out_frame->nb_samples     = 960;
 
     if(av_frame_get_buffer(pl->out_frame, 0))
         return NULL;
 
     pl->pkt = av_packet_alloc();
-    if(pl->pkt)
+    if(pl->pkt == NULL)
         return NULL;
+
+    return pl;
 }
 
 player_err_t player_stream(player_t* pl, const char* url) {
